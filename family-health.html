@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e7c66">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Семья · Витамины и здоровье</title>
+<style>
+:root{
+  --bg:#0b1220; --card:#131c2e; --card2:#1a2540; --line:#22304d;
+  --text:#eef2f9; --muted:#8fa0bd; --accent:#22c39a; --accent2:#0e7c66;
+  --warn:#f2b134; --bad:#ef5d6b; --good:#34d399; --info:#5aa9ff;
+  --r:16px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+button{font-family:inherit;}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;background:
+  radial-gradient(1200px 500px at 50% -10%, rgba(34,195,154,.12), transparent 60%), var(--bg);}
+header{padding:calc(14px + env(safe-area-inset-top)) 18px 10px;display:flex;align-items:center;gap:12px;}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#22c39a,#0e7c66);
+  display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px rgba(34,195,154,.35);}
+header h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.2px;}
+header .sub{font-size:12px;color:var(--muted);margin-top:2px;}
+main{flex:1;padding:6px 14px calc(96px + env(safe-area-inset-bottom));overflow-y:auto;}
+.screen{display:none;animation:fade .18s ease;}
+.screen.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(11,18,32,.86);
+  backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;}
+nav button{background:none;border:0;color:var(--muted);font-size:11px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;padding:6px 10px;border-radius:12px;min-width:64px;cursor:pointer;transition:.15s;}
+nav button .ic{font-size:20px;line-height:1;}
+nav button.active{color:var(--accent);background:rgba(34,195,154,.12);}
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+  border-radius:var(--r);padding:14px;margin:10px 0;}
+.card h3{margin:0 0 8px;font-size:15px;}
+.muted{color:var(--muted);}
+.small{font-size:12px;}
+.row{display:flex;align-items:center;gap:10px;}
+.row.between{justify-content:space-between;}
+.row.wrap{flex-wrap:wrap;}
+.grow{flex:1;}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;
+  background:var(--card2);border:1px solid var(--line);color:var(--muted);}
+.chip.good{background:rgba(52,211,153,.15);color:var(--good);border-color:rgba(52,211,153,.35);}
+.chip.bad{background:rgba(239,93,107,.15);color:var(--bad);border-color:rgba(239,93,107,.35);}
+.chip.warn{background:rgba(242,177,52,.15);color:var(--warn);border-color:rgba(242,177,52,.35);}
+.chip.info{background:rgba(90,169,255,.15);color:var(--info);border-color:rgba(90,169,255,.35);}
+.avatar{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;
+  padding:11px 16px;border-radius:12px;font-size:14px;font-weight:600;transition:.15s;text-decoration:none;}
+.btn.primary{background:linear-gradient(135deg,#22c39a,#0e7c66);color:#fff;box-shadow:0 6px 16px rgba(34,195,154,.3);}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line);}
+.btn.danger{background:rgba(239,93,107,.12);color:var(--bad);border:1px solid rgba(239,93,107,.3);}
+.btn.sm{padding:7px 12px;font-size:13px;border-radius:10px;}
+.btn.big{width:100%;padding:14px;font-size:15px;}
+.btn:active{transform:scale(.97);}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+  background:#0e1727;color:var(--text);font-size:15px;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px;}
+.timegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px;}
+.timebtn{padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:#0e1727;
+  color:var(--muted);font-size:13px;text-align:center;cursor:pointer;font-weight:600;}
+.timebtn.on{background:rgba(34,195,154,.18);color:var(--accent);border-color:var(--accent);}
+.daydots{display:flex;gap:6px;margin-top:6px;}
+.daydot{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#0e1727;color:var(--muted);
+  font-size:11px;display:grid;place-items:center;cursor:pointer;font-weight:600;}
+.daydot.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.pill-done{background:rgba(52,211,153,.15)!important;border-color:rgba(52,211,153,.4)!important;}
+.pill-done .st{color:var(--good)!important;}
+.vitem{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;
+  background:#0e1727;margin:8px 0;cursor:pointer;transition:.15s;}
+.vitem .tm{font-size:13px;color:var(--muted);min-width:44px;font-weight:600;}
+.vitem .nm{font-weight:600;font-size:14px;}
+.vitem .ds{font-size:12px;color:var(--muted);}
+.vitem .st{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+.progress{height:8px;border-radius:99px;background:#0e1727;overflow:hidden;border:1px solid var(--line);}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,#22c39a,#34d399);border-radius:99px;transition:width .3s;}
+.deviation{padding:10px 12px;border-radius:12px;margin:6px 0;border:1px solid;font-size:13px;}
+.deviation.low{background:rgba(90,169,255,.1);border-color:rgba(90,169,255,.35);}
+.deviation.high{background:rgba(242,177,52,.1);border-color:rgba(242,177,52,.35);}
+.deviation.crit{background:rgba(239,93,107,.12);border-color:rgba(239,93,107,.4);}
+.deviation b{text-transform:none;}
+.dev-arrow{font-size:16px;margin-right:6px;}
+.meal{padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.meal:last-child{border-bottom:0;}
+.meal b{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+.shopcat{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px;}
+.shopitem{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px;}
+.shopitem .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;flex:none;transition:.15s;}
+.shopitem.done .box{background:var(--accent);border-color:var(--accent);}
+.shopitem.done .txt{text-decoration:line-through;color:var(--muted);}
+.shopitem .txt{flex:1;}
+.shopitem .why{font-size:11px;color:var(--muted);}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:520px;
+  max-height:88vh;overflow-y:auto;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:up .2s ease;}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{margin:0 0 4px;font-size:18px;}
+.modal .handle{width:40px;height:4px;border-radius:99px;background:var(--line);margin:0 auto 14px;}
+.empty{text-align:center;padding:36px 20px;color:var(--muted);}
+.empty .em{font-size:44px;margin-bottom:10px;}
+.tabs{display:flex;gap:6px;background:#0e1727;border:1px solid var(--line);padding:4px;border-radius:12px;margin:10px 0;}
+.tabs button{flex:1;border:0;background:none;color:var(--muted);padding:8px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;}
+.tabs button.on{background:var(--accent);color:#fff;}
+.who-scroll{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch;}
+.who-chip{flex:none;display:flex;align-items:center;gap:8px;padding:8px 14px 8px 8px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card2);cursor:pointer;transition:.15s;}
+.who-chip.on{border-color:var(--accent);background:rgba(34,195,154,.15);}
+.who-chip .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:16px;}
+.who-chip .nm{font-size:13px;font-weight:600;}
+.who-chip .st{font-size:10px;color:var(--muted);}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#1f2c48;border:1px solid var(--line);
+  color:var(--text);padding:11px 18px;border-radius:12px;font-size:14px;z-index:200;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+.sect-title{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin:18px 4px 4px;font-weight:700;}
+.norm-note{font-size:11px;color:var(--muted);margin-top:4px;}
+.file-drop{border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);
+  font-size:13px;cursor:pointer;margin:10px 0;transition:.15s;}
+.file-drop:hover{border-color:var(--accent);color:var(--accent);}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">💊</div>
+    <div class="grow">
+      <h1>Семейное здоровье</h1>
+      <div class="sub" id="hdr-sub">Витамины · Анализы · Меню</div>
+    </div>
+    <button class="btn ghost sm" id="btn-bell" title="Напоминания">🔔</button>
+  </header>
+
+  <main>
+    <!-- СЕГОДНЯ -->
+    <div class="screen active" id="scr-today">
+      <div class="who-scroll" id="today-who"></div>
+      <div id="today-content"></div>
+    </div>
+
+    <!-- СЕМЬЯ -->
+    <div class="screen" id="scr-family">
+      <div id="family-list"></div>
+      <button class="btn primary big" onclick="openMemberModal()">＋ Добавить члена семьи</button>
+    </div>
+
+    <!-- АНАЛИЗЫ -->
+    <div class="screen" id="scr-labs">
+      <div class="who-scroll" id="labs-who"></div>
+      <div id="labs-content"></div>
+    </div>
+
+    <!-- МЕНЮ -->
+    <div class="screen" id="scr-menu">
+      <div class="card">
+        <div class="row between">
+          <h3>🍽 Меню на неделю</h3>
+          <button class="btn primary sm" onclick="generateMenu()">Сгенерировать</button>
+        </div>
+        <div class="small muted">Меню учитывает дефициты по анализам всей семьи и подбирает продукты, богатые нужными нутриентами.</div>
+        <div id="menu-meta" class="small" style="margin-top:8px"></div>
+      </div>
+      <div id="menu-content"></div>
+      <div id="shopping-wrap"></div>
+    </div>
+  </main>
+
+  <nav>
+    <button class="active" data-scr="today" onclick="go('today')"><span class="ic">🏠</span>Сегодня</button>
+    <button data-scr="family" onclick="go('family')"><span class="ic">👨‍👩‍👧‍👦</span>Семья</button>
+    <button data-scr="labs" onclick="go('labs')"><span class="ic">🧪</span>Анализы</button>
+    <button data-scr="menu" onclick="go('menu')"><span class="ic">🍽</span>Меню</button>
+  </nav>
+</div>
+
+<!-- МОДАЛКА -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ УТИЛИТЫ ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const todayStr = () => new Date().toISOString().slice(0,10);
+const fmtDate = d => { const x = new Date(d); return x.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}); };
+const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const DAYS_FULL = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============ ДАННЫЕ (localStorage) ============ */
+const DB_KEY = 'family_health_v1';
+let DB = load();
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(DB_KEY)); if(d && d.members) return d; }catch(e){}
+  return { members: [], menu: null, shopping: null };
+}
+function save(){ localStorage.setItem(DB_KEY, JSON.stringify(DB)); }
+function getMember(id){ return DB.members.find(m=>m.id===id); }
+
+/* ============ НАВИГАЦИЯ ============ */
+function go(scr){
+  $$('.screen').forEach(s=>s.classList.remove('active'));
+  $('#scr-'+scr).classList.add('active');
+  $$('nav button').forEach(b=>b.classList.toggle('active', b.dataset.scr===scr));
+  if(scr==='today') renderToday();
+  if(scr==='family') renderFamily();
+  if(scr==='labs') renderLabs();
+  if(scr==='menu') renderMenu();
+}
+function openModal(html){ $('#modal').innerHTML = '<div class="handle"></div>'+html; $('#modal-bg').classList.add('open'); }
+function closeModal(){ $('#modal-bg').classList.remove('open'); }
+
+/* ============ СЕМЬЯ ============ */
+const AVATARS = ['👨','👩','👦','👧','🧔','👱‍♀️','👴','👵','🧒','👶'];
+const AV_COLORS = ['#5aa9ff','#f273b6','#22c39a','#f2b134','#9b7bff','#ef5d6b','#34d399','#ff8c5a','#4dd0e1','#c0ca33'];
+let avPick = 0;
+
+function renderFamily(){
+  const el = $('#family-list');
+  if(!DB.members.length){
+    el.innerHTML = `<div class="empty"><div class="em">👨‍👩‍👧‍👦</div>
+      <b>Пока никого нет</b><br><span class="small">Добавьте членов семьи, чтобы вести учёт витаминов и анализов</span></div>`;
+    return;
+  }
+  el.innerHTML = DB.members.map(m=>{
+    const taken = Object.keys(m.intakes||{}).filter(k=>k.startsWith(todayStr())).length;
+    const total = todaySchedule(m).length;
+    const lastLab = (m.labs||[]).slice(-1)[0];
+    return `<div class="card" onclick="openMemberDetail('${m.id}')">
+      <div class="row">
+        <div class="avatar" style="background:${m.color}22">${m.avatar}</div>
+        <div class="grow">
+          <b>${esc(m.name)}</b> <span class="muted small">· ${m.role}</span>
+          <div class="small muted">${m.age} лет · ${m.sex==='f'?'Жен':'Муж'} · витаминов: ${(m.vitamins||[]).length}${lastLab?' · анализ от '+fmtDate(lastLab.date):''}</div>
+        </div>
+        <div>${total?`<span class="chip ${taken>=total?'good':'info'}">${taken}/${total}</span>`:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openMemberModal(id){
+  const m = id ? getMember(id) : null;
+  avPick = m ? AVATARS.indexOf(m.avatar) : Math.floor(Math.random()*4);
+  if(avPick<0) avPick=0;
+  openModal(`
+    <h2>${m?'Редактировать':'Новый член семьи'}</h2>
+    <label>Имя</label><input id="m-name" value="${esc(m?.name||'')}" placeholder="Например, Анна">
+    <label>Роль</label>
+    <select id="m-role">
+      ${['Супруг(а)','Сын','Дочь','Мама','Папа','Другое'].map(r=>`<option ${m?.role===r?'selected':''}>${r}</option>`).join('')}
+    </select>
+    <div class="row">
+      <div class="grow"><label>Возраст</label><input id="m-age" type="number" min="0" max="120" value="${m?.age??30}"></div>
+      <div class="grow"><label>Пол</label><select id="m-sex">
+        <option value="m" ${m?.sex==='m'?'selected':''}>Мужской</option>
+        <option value="f" ${m?.sex==='f'?'selected':''}>Женский</option>
+      </select></div>
+    </div>
+    <label>Аватар</label>
+    <div class="row wrap" id="av-row" style="gap:8px">
+      ${AVATARS.map((a,i)=>`<button class="timebtn ${i===avPick?'on':''}" style="width:44px;height:44px;font-size:20px" onclick="pickAv(${i},this)">${a}</button>`).join('')}
+    </div>
+    <div style="height:14px"></div>
+    <button class="btn primary big" onclick="saveMember('${id||''}')">${m?'Сохранить':'Добавить'}</button>
+    ${m?`<div style="height:8px"></div><button class="btn danger big" onclick="delMember('${m.id}')">Удалить</button>`:''}
+  `);
+}
+function pickAv(i,btn){ avPick=i; $$('#av-row .timebtn').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+function saveMember(id){
+  const name = $('#m-name').value.trim(); if(!name) return toast('Введите имя');
+  const data = { name, role:$('#m-role').value, age:+$('#m-age').value||30, sex:$('#m-sex').value,
+    avatar: AVATARS[avPick], color: AV_COLORS[avPick % AV_COLORS.length] };
+  if(id){ Object.assign(getMember(id), data); }
+  else { DB.members.push({ id:uid(), ...data, vitamins:[], labs:[], intakes:{} }); }
+  save(); closeModal(); renderFamily(); renderToday(); toast('Сохранено ✓');
+}
+function delMember(id){
+  if(!confirm('Удалить члена семьи вместе со всеми данными?')) return;
+  DB.members = DB.members.filter(m=>m.id!==id); save(); closeModal(); renderFamily(); renderToday();
+}
+
+function openMemberDetail(id){
+  const m = getMember(id);
+  const vits = (m.vitamins||[]).map(v=>`
+    <div class="vitem" onclick="openVitaminModal('${m.id}','${v.id}')">
+      <div class="grow"><div class="nm">${esc(v.name)}</div>
+      <div class="ds">${esc(v.dose)} · ${v.times.join(', ')} · ${v.days.length===7?'каждый день':v.days.map(d=>DAYS[d]).join(' ')}</div></div>
+      <div class="st">✏️</div>
+    </div>`).join('');
+  openModal(`
+    <div class="row"><div class="avatar" style="background:${m.color}22">${m.avatar}</div>
+    <div class="grow"><h2>${esc(m.name)}</h2><div class="small muted">${m.role} · ${m.age} лет</div></div>
+    <button class="btn ghost sm" onclick="openMemberModal('${m.id}')">Изменить</button></div>
+    <div class="sect-title">Витамины и добавки</div>
+    ${vits || '<div class="small muted" style="padding:8px 0">Нет витаминов. Добавьте первый!</div>'}
+    <div style="height:10px"></div>
+    <button class="btn primary big" onclick="openVitaminModal('${m.id}')">＋ Добавить витамин</button>
+  `);
+}
+/* ============ ВИТАМИНЫ ============ */
+const COMMON_VITS = ['Витамин D3','Витамин C','Витамин B12','Омега-3','Магний','Железо','Цинк','Кальций','Йод','Фолиевая кислота','Витамин А','Витамин Е','Мультивитамины'];
+const TIME_SLOTS = ['08:00','09:00','12:00','13:00','18:00','20:00','21:00','22:00'];
+let vitTimes = [], vitDays = [];
+
+function openVitaminModal(memberId, vitId){
+  const m = getMember(memberId);
+  const v = vitId ? m.vitamins.find(x=>x.id===vitId) : null;
+  vitTimes = v ? [...v.times] : ['08:00'];
+  vitDays = v ? [...v.days] : [0,1,2,3,4,5,6];
+  openModal(`
+    <h2>${v?'Редактировать витамин':'Новый витамин'}</h2>
+    <div class="small muted" style="margin-bottom:6px">для ${esc(m.name)}</div>
+    <label>Название</label>
+    <input id="v-name" list="vits-list" value="${esc(v?.name||'')}" placeholder="Например, Витамин D3">
+    <datalist id="vits-list">${COMMON_VITS.map(c=>`<option value="${c}">`).join('')}</datalist>
+    <label>Дозировка</label><input id="v-dose" value="${esc(v?.dose||'')}" placeholder="Например, 2000 МЕ, 1 капсула">
+    <label>Время приёма</label>
+    <div class="timegrid" id="v-times">
+      ${TIME_SLOTS.map(t=>`<button class="timebtn ${vitTimes.includes(t)?'on':''}" onclick="tglTime('${t}',this)">${t}</button>`).join('')}
+    </div>
+    <div class="row" style="margin-top:8px;gap:6px">
+      <input id="v-custom-time" type="time" style="flex:1">
+      <button class="btn ghost sm" onclick="addCustomTime()">＋ своё</button>
+    </div>
+    <label>Дни недели</label>
+    <div class="daydots" id="v-days">
+      ${[1,2,3,4,5,6,0].map(d=>`<button class="daydot ${vitDays.includes(d)?'on':''}" data-d="${d}" onclick="tglDay(${d},this)">${DAYS[d]}</button>`).join('')}
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn primary big" onclick="saveVitamin('${memberId}','${vitId||''}')">${v?'Сохранить':'Добавить'}</button>
+    ${v?`<div style="height:8px"></div><button class="btn danger big" onclick="delVitamin('${memberId}','${v.id}')">Удалить</button>`:''}
+  `);
+}
+function tglTime(t,btn){ const i=vitTimes.indexOf(t); if(i>=0) vitTimes.splice(i,1); else vitTimes.push(t); btn.classList.toggle('on'); }
+function addCustomTime(){ const t=$('#v-custom-time').value; if(!t) return; if(!vitTimes.includes(t)){ vitTimes.push(t);
+  const b=document.createElement('button'); b.className='timebtn on'; b.textContent=t; b.onclick=()=>tglTime(t,b); $('#v-times').appendChild(b);} }
+function tglDay(d,btn){ const i=vitDays.indexOf(d); if(i>=0) vitDays.splice(i,1); else vitDays.push(d); btn.classList.toggle('on'); }
+function saveVitamin(memberId, vitId){
+  const name=$('#v-name').value.trim(); if(!name) return toast('Введите название');
+  if(!vitTimes.length) return toast('Выберите время приёма');
+  if(!vitDays.length) return toast('Выберите дни недели');
+  const m = getMember(memberId);
+  const data = { name, dose:$('#v-dose').value.trim()||'1 шт', times:[...vitTimes].sort(), days:vitDays };
+  if(vitId){ Object.assign(m.vitamins.find(x=>x.id===vitId), data); }
+  else { m.vitamins.push({ id:uid(), ...data }); }
+  save(); closeModal(); renderFamily(); renderToday(); toast('Сохранено ✓'); scheduleNotifications();
+}
+function delVitamin(memberId, vitId){
+  if(!confirm('Удалить витамин?')) return;
+  const m=getMember(memberId); m.vitamins = m.vitamins.filter(v=>v.id!==vitId);
+  save(); closeModal(); renderFamily(); renderToday(); scheduleNotifications();
+}
+
+/* ============ СЕГОДНЯ: расписание и отметки ============ */
+function todaySchedule(m, dateStr){
+  const d = dateStr ? new Date(dateStr+'T12:00:00') : new Date();
+  const dow = d.getDay();
+  const list = [];
+  (m.vitamins||[]).forEach(v=>{
+    if(!v.days.includes(dow)) return;
+    v.times.forEach(t=> list.push({ vitId:v.id, name:v.name, dose:v.dose, time:t }));
+  });
+  return list.sort((a,b)=>a.time.localeCompare(b.time));
+}
+function intakeKey(dateStr, vitId, time){ return `${dateStr}|${vitId}|${time}`; }
+function isTaken(m, dateStr, vitId, time){ return !!(m.intakes||{})[intakeKey(dateStr,vitId,time)]; }
+
+let selToday = null;
+function renderToday(){
+  const dayName = DAYS_FULL[new Date().getDay()];
+  $('#hdr-sub').textContent = `Сегодня · ${fmtDate(new Date())} · ${dayName}`;
+  if(!DB.members.length){
+    $('#today-who').innerHTML='';
+    $('#today-content').innerHTML = `<div class="empty"><div class="em">💊</div>
+      <b>Добро пожаловать!</b><br><span class="small">Сначала добавьте членов семьи на вкладке «Семья»,<br>потом назначьте каждому витамины</span></div>
+      <div style="height:12px"></div><button class="btn primary big" onclick="go('family')">Перейти к семье</button>`;
+    return;
+  }
+  if(!selToday || !getMember(selToday)) selToday = DB.members[0].id;
+  $('#today-who').innerHTML = DB.members.map(m=>{
+    const total = todaySchedule(m).length;
+    const taken = todaySchedule(m).filter(s=>isTaken(m,todayStr(),s.vitId,s.time)).length;
+    const pct = total? Math.round(taken/total*100):0;
+    return `<div class="who-chip ${m.id===selToday?'on':''}" onclick="selToday='${m.id}';renderToday()">
+      <div class="av" style="background:${m.color}22">${m.avatar}</div>
+      <div><div class="nm">${esc(m.name)}</div><div class="st">${total? taken+'/'+total+' · '+pct+'%':'нет приёмов'}</div></div>
+    </div>`;
+  }).join('');
+  const m = getMember(selToday);
+  const sched = todaySchedule(m);
+  const taken = sched.filter(s=>isTaken(m,todayStr(),s.vitId,s.time)).length;
+  const pct = sched.length? Math.round(taken/sched.length*100):0;
+  const now = new Date(); const curMin = now.getHours()*60+now.getMinutes();
+  let html = `
+    <div class="card">
+      <div class="row between"><h3>Прогресс дня</h3><span class="chip ${pct===100?'good':pct>0?'info':''}">${pct===100?'Всё принято 🎉':taken+' из '+sched.length}</span></div>
+      <div class="progress"><i style="width:${pct}%"></i></div>
+    </div>`;
+  if(!sched.length){
+    html += `<div class="empty"><div class="em">🌿</div><b>На сегодня приёмов нет</b><br>
+      <span class="small">Добавьте витамины в профиле ${esc(m.name)}</span></div>
+      <button class="btn primary big" onclick="openVitaminModal('${m.id}')">＋ Добавить витамин</button>`;
+  } else {
+    let lastGroup='';
+    sched.forEach(s=>{
+      const [h,mi] = s.time.split(':').map(Number);
+      const mins = h*60+mi;
+      const done = isTaken(m,todayStr(),s.vitId,s.time);
+      let cls='';
+      if(done) cls='pill-done';
+      else if(mins < curMin-30) cls='';
+      html += `<div class="vitem ${cls}" onclick="toggleIntake('${m.id}','${s.vitId}','${s.time}')">
+        <div class="tm">${s.time}</div>
+        <div class="grow"><div class="nm">${esc(s.name)}</div><div class="ds">${esc(s.dose)}</div></div>
+        <div class="st">${done?'✓ принято':(mins<curMin-30?'пропущено':'нажми ✓')}</div>
+      </div>`;
+    });
+  }
+  html += `<div style="height:10px"></div>
+    <div class="row" style="gap:8px">
+      <button class="btn ghost grow" onclick="openVitaminModal('${m.id}')">＋ Витамин</button>
+      <button class="btn ghost grow" onclick="go('labs')">🧪 Анализы</button>
+    </div>`;
+  $('#today-content').innerHTML = html;
+}
+function toggleIntake(memberId, vitId, time){
+  const m = getMember(memberId);
+  if(!m.intakes) m.intakes = {};
+  const k = intakeKey(todayStr(), vitId, time);
+  if(m.intakes[k]) delete m.intakes[k];
+  else { m.intakes[k] = Date.now(); if(navigator.vibrate) navigator.vibrate(30); }
+  save(); renderToday();
+}
+
+/* ============ НАПОМИНАНИЯ ============ */
+let notifTimer = null;
+function scheduleNotifications(){
+  if(notifTimer) clearInterval(notifTimer);
+  notifTimer = setInterval(checkNotifications, 30000);
+  checkNotifications();
+}
+function checkNotifications(){
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const now = new Date();
+  const hm = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  DB.members.forEach(m=>{
+    todaySchedule(m).forEach(s=>{
+      if(s.time===hm && !isTaken(m,todayStr(),s.vitId,s.time)){
+        const k = 'ntf_'+todayStr()+m.id+s.vitId+s.time;
+        if(sessionStorage.getItem(k)) return;
+        sessionStorage.setItem(k,'1');
+        new Notification(`💊 ${m.name}, время витаминов!`, { body:`${s.name} · ${s.dose} · ${s.time}`, icon:'💊' });
+      }
+    });
+  });
+}
+$('#btn-bell').addEventListener('click', async ()=>{
+  if(!('Notification' in window)) return toast('Браузер не поддерживает уведомления');
+  const p = await Notification.requestPermission();
+  toast(p==='granted' ? '🔔 Напоминания включены!' : 'Уведомления запрещены в настройках браузера');
+});
+
+/* ============ АНАЛИЗЫ: база показателей с нормами ============ */
+/* norm: функция (age, sex) -> [min, max]. lowFoods/highFoods — рекомендации. nutrient — тег для меню */
+const LAB_TESTS = [
+  { id:'hb',   name:'Гемоглобин',        unit:'г/л',    aliases:['гемоглобин','hemoglobin','hgb','hb'],
+    norm:(a,s)=> a<1?[110,140]: a<6?[115,145]: a<12?[120,150]: s==='f'?[120,150]:[130,170],
+    nutrient:'железо', lowFoods:['Говядина','Печень','Чечевица','Гречка','Шпинат','Гранат'], vit:'Железо' },
+  { id:'ferr', name:'Ферритин',          unit:'нг/мл',  aliases:['ферритин','ferritin'],
+    norm:(a,s)=> a<12?[10,120]: s==='f'?[15,150]:[30,300],
+    nutrient:'железо', lowFoods:['Красное мясо','Индейка','Тыквенные семечки','Киноа','Курага'], vit:'Железо' },
+  { id:'vitd', name:'Витамин D (25-OH)', unit:'нг/мл',  aliases:['витамин d','25-oh','25(oh)','vitamin d','кальциферол'],
+    norm:()=> [30,100], nutrient:'витамин D', lowFoods:['Лосось','Скумбрия','Яичный желток','Печень трески','Шампиньоны'], vit:'Витамин D3' },
+  { id:'b12',  name:'Витамин B12',       unit:'пг/мл',  aliases:['витамин b12','b12','цианокобаламин'],
+    norm:()=> [200,900], nutrient:'B12', lowFoods:['Говядина','Печень','Скумбрия','Яйца','Сыр'], vit:'Витамин B12' },
+  { id:'fol',  name:'Фолиевая кислота',  unit:'нг/мл',  aliases:['фолиевая','фолаты','folate','b9'],
+    norm:()=> [4,20], nutrient:'фолаты', lowFoods:['Шпинат','Брокколи','Чечевица','Авокадо','Арахис'], vit:'Фолиевая кислота' },
+  { id:'ca',   name:'Кальций',           unit:'ммоль/л',aliases:['кальций','calcium','ca'],
+    norm:a=> a<12?[2.2,2.7]:[2.15,2.55], nutrient:'кальций', lowFoods:['Творог','Сыр','Кунжут','Сардины','Миндаль'], vit:'Кальций' },
+  { id:'mg',   name:'Магний',            unit:'ммоль/л',aliases:['магний','magnesium','mg'],
+    norm:()=> [0.7,1.05], nutrient:'магний', lowFoods:['Гречка','Орехи','Бананы','Тёмный шоколад','Овсянка'], vit:'Магний' },
+  { id:'glu',  name:'Глюкоза',           unit:'ммоль/л',aliases:['глюкоза','сахар','glucose'],
+    norm:()=> [3.9,5.5], nutrient:'сахар', highFoods:['Овощи','Цельнозерновые','Бобовые'], vit:null },
+  { id:'chol', name:'Холестерин общий',  unit:'ммоль/л',aliases:['холестерин','cholesterol'],
+    norm:()=> [3.0,5.2], nutrient:'холестерин', highFoods:['Овсянка','Рыба','Оливковое масло','Орехи'], vit:'Омега-3' },
+  { id:'fe',   name:'Железо сывороточное',unit:'мкмоль/л',aliases:['железо','iron','fe'],
+    norm:(a,s)=> a<12?[9,22]: s==='f'?[9,30]:[11,30],
+    nutrient:'железо', lowFoods:['Говядина','Чечевица','Гречка','Яблоки'], vit:'Железо' },
+  { id:'tsh',  name:'ТТГ',               unit:'мМЕ/л',  aliases:['ттг','tsh','тиреотропин'],
+    norm:()=> [0.4,4.0], nutrient:'йод', lowFoods:['Морская рыба','Креветки','Морская капуста','Яйца'], vit:'Йод' },
+  { id:'leu',  name:'Лейкоциты',         unit:'×10⁹/л', aliases:['лейкоциты','wbc','лейк'],
+    norm:a=> a<12?[5,12]:[4,9], nutrient:'иммунитет', lowFoods:['Цитрусовые','Имбирь','Чеснок','Мёд'], vit:'Витамин C' },
+  { id:'ery',  name:'Эритроциты',        unit:'×10¹²/л',aliases:['эритроциты','rbc'],
+    norm:(a,s)=> a<12?[3.9,5.3]: s==='f'?[3.9,5.3]:[4.3,5.7], nutrient:'железо', lowFoods:['Говядина','Свёкла','Гречка'], vit:'Железо' },
+  { id:'plt',  name:'Тромбоциты',        unit:'×10⁹/л', aliases:['тромбоциты','plt','platelet'],
+    norm:()=> [180,320], nutrient:null, lowFoods:[], vit:null },
+  { id:'soe',  name:'СОЭ',               unit:'мм/ч',   aliases:['соэ','esr','скорость оседания'],
+    norm:(a,s)=> s==='f'?[2,15]:[1,10], nutrient:null, highFoods:['Ягоды','Зелень','Рыба'], vit:null },
+  { id:'prot', name:'Общий белок',       unit:'г/л',    aliases:['белок общий','protein','общий белок'],
+    norm:()=> [64,83], nutrient:'белок', lowFoods:['Курица','Рыба','Яйца','Творог','Бобовые'], vit:null },
+  { id:'k',    name:'Калий',             unit:'ммоль/л',aliases:['калий','potassium','k'],
+    norm:()=> [3.5,5.1], nutrient:'калий', lowFoods:['Бананы','Картофель','Курага','Авокадо'], vit:null },
+  { id:'zn',   name:'Цинк',              unit:'мкмоль/л',aliases:['цинк','zinc','zn'],
+    norm:()=> [11,24], nutrient:'цинк', lowFoods:['Тыквенные семечки','Говядина','Орехи','Сыр'], vit:'Цинк' },
+  { id:'iodine',name:'Йод (моча)',       unit:'мкг/л',  aliases:['йод','iodine'],
+    norm:()=> [100,200], nutrient:'йод', lowFoods:['Морская рыба','Морская капуста','Креветки'], vit:'Йод' },
+  { id:'omega3',name:'Омега-3 индекс',   unit:'%',      aliases:['омега','omega'],
+    norm:()=> [8,12], nutrient:'омега-3', lowFoods:['Лосось','Скумбрия','Сардины','Льняное семя','Грецкие орехи'], vit:'Омега-3' },
+];
+
+let selLabs = null;
+function renderLabs(){
+  if(!DB.members.length){
+    $('#labs-who').innerHTML='';
+    $('#labs-content').innerHTML = `<div class="empty"><div class="em">🧪</div><b>Сначала добавьте семью</b></div>`;
+    return;
+  }
+  if(!selLabs || !getMember(selLabs)) selLabs = DB.members[0].id;
+  $('#labs-who').innerHTML = DB.members.map(m=>`
+    <div class="who-chip ${m.id===selLabs?'on':''}" onclick="selLabs='${m.id}';renderLabs()">
+      <div class="av" style="background:${m.color}22">${m.avatar}</div>
+      <div><div class="nm">${esc(m.name)}</div><div class="st">${(m.labs||[]).length} анализов</div></div>
+    </div>`).join('');
+  const m = getMember(selLabs);
+  const labs = (m.labs||[]).slice().reverse();
+  let html = `<button class="btn primary big" onclick="openLabModal('${m.id}')">＋ Добавить анализ</button>`;
+  if(!labs.length){
+    html += `<div class="empty"><div class="em">📋</div><b>Анализов пока нет</b><br>
+      <span class="small">Загрузите документ или введите показатели вручную — приложение покажет отклонения от нормы</span></div>`;
+  }
+  labs.forEach(lab=>{
+    const devs = lab.results.filter(r=>r.status!=='ok');
+    html += `<div class="card">
+      <div class="row between">
+        <h3>📄 Анализ от ${fmtDate(lab.date)}</h3>
+        <button class="btn danger sm" onclick="delLab('${m.id}','${lab.id}')">✕</button>
+      </div>
+      ${devs.length? `<div class="chip warn">${devs.length} отклонени${devs.length===1?'е':'й'}</div>` : `<div class="chip good">Всё в норме ✓</div>`}
+      <div style="height:8px"></div>
+      ${lab.results.filter(r=>r.status==='ok').length? `<div class="small muted" style="margin:4px 0">В норме: ${lab.results.filter(r=>r.status==='ok').map(r=>esc(r.test.name)).join(', ')}</div>`:''}
+      ${devs.map(d=>{
+        const arrow = d.status==='low'?'⬇':'⬆';
+        const cls = d.status==='low'?'low':'high';
+        return `<div class="deviation ${cls}">
+          <b>${esc(d.test.name)}</b>: ${d.value} ${d.test.unit}
+          <span class="dev-arrow">${arrow}</span>
+          <span class="muted">(норма ${d.norm[0]}–${d.norm[1]})</span>
+          ${d.test.lowFoods && d.status==='low' && d.test.lowFoods.length? `<div class="small" style="margin-top:6px">🥗 Добавьте в рацион: <b>${d.test.lowFoods.join(', ')}</b></div>`:''}
+          ${d.test.highFoods && d.status==='high'? `<div class="small" style="margin-top:6px">🥗 Рекомендуется: <b>${d.test.highFoods.join(', ')}</b></div>`:''}
+          ${d.test.vit && d.status==='low'? `<div class="small" style="margin-top:4px">💊 Обсудите с врачом приём: <b>${d.test.vit}</b></div>`:''}
+        </div>`;
+      }).join('')}
+      <div class="norm-note">⚠️ Нормы справочные. Для интерпретации обратитесь к врачу.</div>
+    </div>`;
+  });
+  $('#labs-content').innerHTML = html;
+}
+function delLab(memberId, labId){
+  if(!confirm('Удалить анализ?')) return;
+  const m=getMember(memberId); m.labs = m.labs.filter(l=>l.id!==labId);
+  save(); renderLabs();
+}
+
+/* --- Модалка добавления анализа --- */
+let labRows = [];
+function openLabModal(memberId){
+  labRows = [{ testId:'hb', value:'' }];
+  openModal(`
+    <h2>Новый анализ</h2>
+    <div class="small muted" style="margin-bottom:4px">для ${esc(getMember(memberId).name)}</div>
+    <label>Дата анализа</label>
+    <input id="lab-date" type="date" value="${todayStr()}">
+    <div class="tabs">
+      <button class="on" id="tab-manual" onclick="labTab('manual')">✍️ Вручную</button>
+      <button id="tab-file" onclick="labTab('file')">📄 Из документа</button>
+    </div>
+    <div id="lab-manual">
+      <div id="lab-rows"></div>
+      <button class="btn ghost sm" onclick="addLabRow()">＋ Добавить показатель</button>
+    </div>
+    <div id="lab-file" class="hidden">
+      <div class="file-drop" onclick="document.getElementById('lab-file-input').click()">
+        📎 Нажмите, чтобы выбрать файл анализа<br>
+        <span class="small">PDF или фото — попробуем распознать показатели автоматически</span>
+      </div>
+      <input type="file" id="lab-file-input" accept=".pdf,.txt,.csv,image/*" class="hidden" onchange="parseLabFile(this,'${memberId}')">
+      <div id="lab-file-status" class="small muted"></div>
+    </div>
+    <div style="height:14px"></div>
+    <button class="btn primary big" onclick="saveLab('${memberId}')">Сохранить и проверить</button>
+  `);
+  renderLabRows();
+}
+function labTab(t){
+  $('#tab-manual').classList.toggle('on', t==='manual');
+  $('#tab-file').classList.toggle('on', t==='file');
+  $('#lab-manual').classList.toggle('hidden', t!=='manual');
+  $('#lab-file').classList.toggle('hidden', t!=='file');
+}
+function addLabRow(){ labRows.push({testId:LAB_TESTS[0].id, value:''}); renderLabRows(); }
+function renderLabRows(){
+  $('#lab-rows').innerHTML = labRows.map((r,i)=>`
+    <div class="row" style="margin:8px 0;gap:8px">
+      <select style="flex:1.4" onchange="labRows[${i}].testId=this.value">
+        ${LAB_TESTS.map(t=>`<option value="${t.id}" ${t.id===r.testId?'selected':''}>${t.name}, ${t.unit}</option>`).join('')}
+      </select>
+      <input style="flex:1" type="number" step="0.01" placeholder="Значение" value="${r.value}" onchange="labRows[${i}].value=this.value">
+      <button class="btn danger sm" onclick="labRows.splice(${i},1);renderLabRows()">✕</button>
+    </div>`).join('');
+}
+function saveLab(memberId){
+  const m = getMember(memberId);
+  const date = $('#lab-date').value || todayStr();
+  const results = [];
+  labRows.forEach(r=>{
+    if(r.value===''||r.value==null) return;
+    const test = LAB_TESTS.find(t=>t.id===r.testId);
+    const norm = test.norm(m.age, m.sex);
+    const val = parseFloat(r.value);
+    const status = val < norm[0] ? 'low' : val > norm[1] ? 'high' : 'ok';
+    results.push({ testId:test.id, test, value:val, norm, status });
+  });
+  if(!results.length) return toast('Введите хотя бы один показатель');
+  m.labs = m.labs||[]; m.labs.push({ id:uid(), date, results });
+  save(); closeModal(); renderLabs();
+  const devs = results.filter(r=>r.status!=='ok').length;
+  toast(devs? `Найдено отклонений: ${devs}` : 'Все показатели в норме ✓');
+}
+
+/* --- Распознавание файла анализа --- */
+async function parseLabFile(input, memberId){
+  const f = input.files[0]; if(!f) return;
+  const st = $('#lab-file-status');
+  st.innerHTML = '⏳ Обработка файла…';
+  try{
+    let text = '';
+    if(f.type.startsWith('image/')){
+      st.innerHTML = '📷 Распознаём текст с фото (OCR)…';
+      text = await ocrImage(f);
+    } else if(f.name.toLowerCase().endsWith('.pdf')){
+      st.innerHTML = '📄 Извлекаем текст из PDF…';
+      text = await pdfToText(f);
+    } else {
+      text = await f.text();
+    }
+    const found = extractLabValues(text, getMember(memberId));
+    if(!found.length){ st.innerHTML = '⚠️ Не удалось распознать показатели. Введите их вручную на вкладке «Вручную».'; return; }
+    st.innerHTML = `✅ Распознано показателей: <b>${found.length}</b>. Проверьте и сохраните.`;
+    // Переносим найденное в ручные строки для проверки
+    labRows = found.map(x=>({ testId:x.test.id, value:String(x.value) }));
+    labTab('manual'); renderLabRows();
+  }catch(e){
+    console.error(e);
+    st.innerHTML = '⚠️ Не получилось прочитать файл. Введите показатели вручную.';
+  }
+}
+/* OCR через встроенный распознаватель не поддерживается нативно — используем простой путь:
+   читаем как dataURL и просим пользователя подтвердить ручной ввод (без внешних API).
+   Но если в браузере есть Shape Detection / иной API — можно расширить. */
+async function ocrImage(file){
+  throw new Error('ocr-na');
+}
+async function pdfToText(file){
+  // Минимальный парсер текстового слоя PDF без библиотек: достаём строки в скобках из потоков.
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let s = ''; for(let i=0;i<bytes.length;i++) s += String.fromCharCode(bytes[i]);
+  const parts = [];
+  const re = /\((?:[^()\\]|\\.)*\)/g;
+  let mch;
+  while((mch = re.exec(s)) !== null){
+    let t = mch[0].slice(1,-1).replace(/\\([()\\])/g,'$1').replace(/\\(\d{1,3})/g,(m,o)=>String.fromCharCode(parseInt(o,8)));
+    if(/[A-Za-zА-Яа-я0-9]/.test(t)) parts.push(t);
+  }
+  if(parts.join(' ').length < 30) throw new Error('pdf-no-text');
+  return parts.join(' ');
+}
+function extractLabValues(text, member){
+  const low = text.toLowerCase().replace(/,/g,'.');
+  const found = [];
+  LAB_TESTS.forEach(t=>{
+    for(const al of t.aliases){
+      const idx = low.indexOf(al);
+      if(idx<0) continue;
+      // берём фрагмент после названия и ищем число
+      const frag = low.slice(idx, idx+80);
+      const m = frag.match(/(-?\d+(?:\.\d+)?)/);
+      if(m){
+        const val = parseFloat(m[1]);
+        const norm = t.norm(member.age, member.sex);
+        if(isFinite(val) && val>0 && val < norm[1]*50){
+          found.push({ test:t, value:val });
+          break;
+        }
+      }
+    }
+  });
+  return found;
+}
+
+/* ============ МЕНЮ НА НЕДЕЛЮ + СПИСОК ПОКУПОК ============ */
+/* Каждое блюдо: продукты + нутриенты, которые оно покрывает */
+const MEALS = {
+  breakfast: [
+    { name:'Овсянка с бананом и орехами', nutrients:['магний','калий'], items:['Овсянка','Бананы','Грецкие орехи','Молоко'] },
+    { name:'Яичница из 2 яиц с помидорами', nutrients:['витамин D','B12'], items:['Яйца','Помидоры','Сыр'] },
+    { name:'Творог с мёдом и ягодами', nutrients:['кальций','белок'], items:['Творог','Мёд','Ягоды'] },
+    { name:'Гречневая каша с молоком', nutrients:['железо','магний'], items:['Гречка','Молоко','Сливочное масло'] },
+    { name:'Сырники со сметаной', nutrients:['кальций','белок'], items:['Творог','Яйца','Мука','Сметана'] },
+    { name:'Омлет с сыром и шпинатом', nutrients:['витамин D','кальций','фолаты'], items:['Яйца','Сыр','Шпинат','Молоко'] },
+    { name:'Каша рисовая с тыквой', nutrients:['калий'], items:['Рис','Тыква','Молоко'] },
+  ],
+  lunch: [
+    { name:'Гречка с говядиной и салатом', nutrients:['железо','B12'], items:['Гречка','Говядина','Огурцы','Помидоры','Зелень'] },
+    { name:'Запечённый лосось с рисом и брокколи', nutrients:['витамин D','омега-3','фолаты'], items:['Лосось','Рис','Брокколи','Лимон'] },
+    { name:'Куриная грудка с картофелем и овощами', nutrients:['белок','калий'], items:['Курица','Картофель','Морковь','Лук'] },
+    { name:'Чечевичный суп + цельнозерновой хлеб', nutrients:['железо','фолаты','магний'], items:['Чечевица','Морковь','Лук','Хлеб цельнозерновой'] },
+    { name:'Печень куриная со сметаной и гречкой', nutrients:['железо','B12','витамин D'], items:['Печень куриная','Сметана','Гречка','Лук'] },
+    { name:'Скумбрия запечённая с овощным рагу', nutrients:['омега-3','витамин D'], items:['Скумбрия','Кабачок','Морковь','Помидоры'] },
+    { name:'Плов с индейкой', nutrients:['железо','белок'], items:['Индейка','Рис','Морковь','Лук'] },
+    { name:'Борщ со сметаной и чёрным хлебом', nutrients:['железо','фолаты'], items:['Свёкла','Капуста','Картофель','Говядина','Сметана','Хлеб'] },
+  ],
+  snack: [
+    { name:'Яблоко + горсть миндаля', nutrients:['кальций','магний'], items:['Яблоки','Миндаль'] },
+    { name:'Банан', nutrients:['калий','магний'], items:['Бананы'] },
+    { name:'Кефир + тыквенные семечки', nutrients:['кальций','цинк'], items:['Кефир','Тыквенные семечки'] },
+    { name:'Творожок с курагой', nutrients:['кальций','железо','калий'], items:['Творог','Курага'] },
+    { name:'Апельсин + орехи', nutrients:['иммунитет','магний'], items:['Апельсины','Грецкие орехи'] },
+    { name:'Гранат (сок/зёрна)', nutrients:['железо'], items:['Гранат'] },
+    { name:'Тёмный шоколад (20 г) + чай', nutrients:['магний'], items:['Тёмный шоколад'] },
+  ],
+  dinner: [
+    { name:'Индейка с киноа и огурцами', nutrients:['железо','белок','магний'], items:['Индейка','Киноа','Огурцы'] },
+    { name:'Запечённые сардины с картофелем', nutrients:['омега-3','кальций','витамин D'], items:['Сардины','Картофель','Лимон'] },
+    { name:'Салат со шпинатом, яйцом и кунжутом', nutrients:['фолаты','кальций','железо'], items:['Шпинат','Яйца','Кунжут','Оливковое масло'] },
+    { name:'Тушёная капуста с курицей', nutrients:['иммунитет','белок'], items:['Капуста','Курица','Морковь'] },
+    { name:'Рыбные котлеты с овощным салатом', nutrients:['омега-3','витамин D'], items:['Минтай','Яйца','Помидоры','Огурцы','Зелень'] },
+    { name:'Макароны твёрдых сортов с сыром и брокколи', nutrients:['кальций','фолаты'], items:['Макароны','Сыр','Брокколи'] },
+    { name:'Творожная запеканка', nutrients:['кальций','белок'], items:['Творог','Яйца','Сметана'] },
+  ],
+};
+const CATEGORY = {
+  'Мясо и рыба':['Говядина','Курица','Индейка','Печень куриная','Печень','Лосось','Скумбрия','Сардины','Минтай','Красное мясо','Креветки'],
+  'Молочные':['Молоко','Творог','Сыр','Сметана','Кефир','Сливочное масло'],
+  'Крупы и макароны':['Овсянка','Гречка','Рис','Киноа','Макароны','Чечевица','Хлеб цельнозерновой','Хлеб','Мука'],
+  'Овощи и зелень':['Помидоры','Огурцы','Морковь','Лук','Картофель','Капуста','Брокколи','Шпинат','Кабачок','Свёкла','Тыква','Зелень','Чеснок','Морская капуста','Шампиньоны'],
+  'Фрукты и ягоды':['Яблоки','Бананы','Апельсины','Гранат','Лимон','Ягоды','Курага','Авокадо'],
+  'Орехи и семечки':['Грецкие орехи','Миндаль','Тыквенные семечки','Кунжут','Арахис','Льняное семя','Орехи'],
+  'Прочее':['Яйца','Мёд','Тёмный шоколад','Оливковое масло','Печень трески','Имбирь','Цитрусовые'],
+};
+function catOf(item){
+  for(const c in CATEGORY) if(CATEGORY[c].includes(item)) return c;
+  return 'Прочее';
+}
+
+/* Дефициты семьи по последним анализам */
+function familyDeficits(){
+  const defs = {}; // nutrient -> [имена]
+  DB.members.forEach(m=>{
+    const last = (m.labs||[]).slice(-1)[0];
+    if(!last) return;
+    last.results.filter(r=>r.status==='low' && r.test.nutrient).forEach(r=>{
+      defs[r.test.nutrient] = defs[r.test.nutrient]||[];
+      if(!defs[r.test.nutrient].includes(m.name)) defs[r.test.nutrient].push(m.name);
+    });
+  });
+  return defs;
+}
+
+function generateMenu(){
+  if(!DB.members.length){ toast('Сначала добавьте семью'); return; }
+  const defs = familyDeficits();
+  const week = [];
+  const start = new Date();
+  const picks = { breakfast:0, lunch:0, snack:0, dinner:0 };
+  for(let d=0; d<7; d++){
+    const date = new Date(start); date.setDate(start.getDate()+d);
+    const day = { date: date.toISOString().slice(0,10), meals:{} };
+    for(const slot of ['breakfast','lunch','snack','dinner']){
+      const pool = MEALS[slot];
+      let best=null, bestScore=-1;
+      for(let i=0;i<pool.length;i++){
+        const idx = (picks[slot]+i) % pool.length;
+        const meal = pool[idx];
+        let score = 0;
+        meal.nutrients.forEach(n=>{ if(defs[n]) score += defs[n].length*10; });
+        score += Math.random()*3;
+        if(score>bestScore){ bestScore=score; best=idx; }
+      }
+      picks[slot] = best+1;
+      day.meals[slot] = pool[best];
+    }
+    week.push(day);
+  }
+  // Список покупок
+  const items = {};
+  week.forEach(day=>{
+    for(const slot in day.meals){
+      day.meals[slot].items.forEach(it=>{
+        items[it] = items[it] || { count:0, nutrients:new Set() };
+        items[it].count++;
+        day.meals[slot].nutrients.forEach(n=>items[it].nutrients.add(n));
+      });
+    }
+  });
+  // Добавим продукты из рекомендаций по отклонениям
+  DB.members.forEach(m=>{
+    const last=(m.labs||[]).slice(-1)[0]; if(!last) return;
+    last.results.filter(r=>r.status==='low' && r.test.lowFoods).forEach(r=>{
+      r.test.lowFoods.slice(0,2).forEach(f=>{
+        if(!items[f]){ items[f]={count:1,nutrients:new Set([r.test.nutrient])}; }
+      });
+    });
+  });
+  const shopping = {};
+  Object.entries(items).forEach(([it,meta])=>{
+    const c = catOf(it);
+    shopping[c] = shopping[c]||[];
+    shopping[c].push({ name:it, count:meta.count, nutrients:[...meta.nutrients], bought:false });
+  });
+  Object.values(shopping).forEach(arr=>arr.sort((a,b)=>a.name.localeCompare(b.name,'ru')));
+
+  DB.menu = { created: todayStr(), week, deficits: defs };
+  DB.shopping = shopping;
+  save(); renderMenu();
+  toast('Меню на неделю готово 🍽');
+}
+
+function renderMenu(){
+  const defs = familyDeficits();
+  const meta = $('#menu-meta');
+  if(Object.keys(defs).length){
+    meta.innerHTML = '⚡ Учтены дефициты: ' + Object.entries(defs).map(([n,who])=>`<span class="chip warn">${n} (${who.join(', ')})</span>`).join(' ');
+  } else {
+    meta.innerHTML = '<span class="chip good">Дефицитов по анализам нет — сбалансированное меню</span>';
+  }
+  const mc = $('#menu-content');
+  if(!DB.menu){
+    mc.innerHTML = `<div class="empty"><div class="em">🗓</div><b>Меню ещё не создано</b><br>
+      <span class="small">Нажмите «Сгенерировать» — приложение составит меню на 7 дней с учётом анализов семьи</span></div>`;
+    $('#shopping-wrap').innerHTML='';
+    return;
+  }
+  const SLOT_NAME = { breakfast:'🌅 Завтрак', lunch:'☀️ Обед', snack:'🍎 Перекус', dinner:'🌙 Ужин' };
+  mc.innerHTML = DB.menu.week.map(day=>{
+    const d = new Date(day.date+'T12:00:00');
+    const isToday = day.date===todayStr();
+    return `<div class="card" ${isToday?'style="border-color:var(--accent)"':''}>
+      <h3>${DAYS_FULL[d.getDay()]}, ${fmtDate(d)} ${isToday?'<span class="chip good">сегодня</span>':''}</h3>
+      ${['breakfast','lunch','snack','dinner'].map(slot=>{
+        const meal = day.meals[slot];
+        return `<div class="meal"><b>${SLOT_NAME[slot]}</b><br>${esc(meal.name)}
+          ${meal.nutrients.filter(n=>defs[n]).length?`<div class="small" style="color:var(--warn)">⚡ ${meal.nutrients.filter(n=>defs[n]).join(', ')}</div>`:''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+
+  // Список покупок
+  const sw = $('#shopping-wrap');
+  let total=0, bought=0;
+  Object.values(DB.shopping||{}).flat().forEach(i=>{ total++; if(i.bought) bought++; });
+  sw.innerHTML = `
+    <div class="card">
+      <div class="row between">
+        <h3>🛒 Список покупок на неделю</h3>
+        <span class="chip info">${bought}/${total}</span>
+      </div>
+      <div class="progress" style="margin:6px 0"><i style="width:${total?Math.round(bought/total*100):0}%"></i></div>
+      <div class="small muted">Отмечайте купленное — список собран автоматически из меню и рекомендаций по анализам.</div>
+    </div>
+    ${Object.entries(DB.shopping||{}).map(([cat,arr])=>`
+      <div class="shopcat">${cat}</div>
+      <div class="card" style="padding:6px 14px">
+        ${arr.map((it,i)=>`
+          <div class="shopitem ${it.bought?'done':''}" onclick="toggleBought('${cat}',${i})">
+            <div class="box">${it.bought?'✓':''}</div>
+            <div class="txt">${esc(it.name)}</div>
+            <div class="why">${it.nutrients.filter(n=>defs[n]).map(n=>'⚡'+n).join(' ')||'×'+it.count}</div>
+          </div>`).join('')}
+      </div>`).join('')}
+    <div style="height:8px"></div>
+    <button class="btn ghost big" onclick="resetBought()">🔄 Сбросить отметки (новая неделя)</button>
+  `;
+}
+function toggleBought(cat, idx){
+  DB.shopping[cat][idx].bought = !DB.shopping[cat][idx].bought;
+  save(); renderMenu();
+}
+function resetBought(){
+  Object.values(DB.shopping||{}).flat().forEach(i=>i.bought=false);
+  save(); renderMenu();
+}
+
+if('Notification' in window && Notification.permission==='default'){
+  // попросим разрешение при первом визите позже по кнопке
+}
+scheduleNotifications();
+renderToday();
+</script>
+</body>
+</html>
